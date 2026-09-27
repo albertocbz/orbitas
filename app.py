@@ -53,7 +53,7 @@ def generar_escenario(
     lim_y = b_ua * 1.15
     axis.set_xlim([-lim_x, lim_x])
     axis.set_ylim([-lim_y, lim_y])
-    axis.imshow(fondo, extent=[-lim_ua, lim_ua, -lim_ua, lim_ua], zorder=0, aspect='auto')
+    axis.imshow(fondo, extent=[-lim_x, lim_x, -lim_y, lim_y], zorder=0, aspect='auto')
     sol_x = c/UA
     axis.imshow(sol, extent=[sol_x - 1.5, sol_x + 1.5, -1.5, 1.5], zorder=1)
     

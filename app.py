@@ -19,20 +19,13 @@ e = st.sidebar.slider("Excentricidad", 0.0, 0.99, 0.5, 0.01)
 r_0_ua = st.sidebar.slider("Posición inicial en x (UA)", 0.5, 10.0, 1.0, 0.5)
 
 M_solares = st.sidebar.slider("Masa de la estrella (masas solares)", 1.0, 100.0, 10.0, 1.0)
-
-# Botón corregido con índice [0]
 col1 = st.sidebar.columns(1)
 play = col1[0].button("Play")
-
-# Constantes físicas
 G = 6.67430e-11
 M = M_solares * 1.989e30
 r_0 = r_0_ua * 1.496e11
-
 a = r_0 / (1 - e**2)
 c = e * a
-
-# Factor de conversión a Unidades Astronómicas (UA) para graficar limpio
 UA = 1.496e11
 
 fondo = Image.open("fondo-2.jpg")
@@ -56,21 +49,15 @@ def generar_escenario(
     axis.tick_params(colors="white", which="both")
     for spine in axis.spines.values():
         spine.set_edgecolor("white")
-    
-    # Límites del gráfico en Unidades Astronómicas (UA)
     lim_ua = 15.0
     axis.set_xlim([-lim_ua, lim_ua])
     axis.set_ylim([-lim_ua, lim_ua])
-    
-    # Mostrar fondo adaptado a UA
     axis.imshow(fondo, extent=[-lim_ua, lim_ua, -lim_ua, lim_ua], zorder=0, aspect='auto')
-    
-    # Posición del Sol en UA (el foco está en x = c/UA, y = 0)
     sol_x = c / UA
     axis.imshow(sol, extent=[sol_x - 1.5, sol_x + 1.5, -1.5, 1.5], zorder=1)
+    axis.imshow(planeta, extent=[r_0_ua-1.0, r_0_ua+1.0, -1.0, 1.0])
     
     if mostrar_planeta and x_anim is not None:
-        # Convertir trayectoria a UA
         x_ua = x_anim / UA
         y_ua = y_anim / UA
         
@@ -96,7 +83,6 @@ def generar_escenario(
     return fig
 
 if st.session_state.animando:
-    # 1. Definimos E uniformemente de 0 a 2*pi para completar toda la órbita elíptica
     E = np.linspace(0, 2 * np.pi, 120)
     
     # 2. Ecuaciones paramétricas de la elipse en función de E

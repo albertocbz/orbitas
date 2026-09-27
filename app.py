@@ -15,19 +15,15 @@ st.write(
 )
 
 st.sidebar.header("Parámetros")
+e= st.sidebar.slider("Excentricidad", 0.0, 1.0, 0.5, 0.01
 r_0_ua = st.sidebar.slider("Posición inicial en x (UA)", 0.5, 10.0, 1.0, 0.5)
-v_0 = st.sidebar.slider("Velocidad inicial perpendicular a x en (km/s)", 0.0, 50.0, 1.0, 30.0)
-v_0 = v_0*1000
 M_solares = st.sidebar.slider("Masa de la estrella (masas solares)", 1.0, 100.0, 10.0, 1.0)
 col1 = st.sidebar.columns(1)
 play = col1[0].button("Play")
 G = 6.67430e-11
 M = M_solares * 1.989e30
 r_0 = r_0_ua * 1.496e11
-h = v_0*r_0
-E = (v_0**2)/2 - G*M/r_0
-e = np.sqrt((1+2*E*h**2)/((G**2)*M**2))
-a = r_0 / (1 - e**2)
+a = r_0 / (1-e)
 c = e * a
 UA = 1.496e11
 
@@ -86,10 +82,10 @@ def generar_escenario(
     return fig
 
 if st.session_state.animando:
-    E = np.linspace(0, 2 * np.pi, 120)
+    M = np.linspace(0, 2 * np.pi, 120)
     
-    x_trayectoria = a * (np.cos(E) - e)
-    y_trayectoria = a * np.sqrt(1 - e**2) * np.sin(E)
+    x_trayectoria = a * (np.cos(M) - e)
+    y_trayectoria = a * np.sqrt(1 - e**2) * np.sin(M)
     
     for i in range(1, len(x_trayectoria)):
         fig = generar_escenario(

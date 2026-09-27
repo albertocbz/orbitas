@@ -16,7 +16,7 @@ st.write(
 
 st.sidebar.header("Parámetros")
 r_0_ua = st.sidebar.slider("Posición inicial en x (UA)", 0.5, 10.0, 1.0, 0.5)
-v_0 = st.sidebar.slider("Velocidad inicial perpendicular a x en (km/s), 0.0, 50.0, 1.0, 30.0)
+v_0 = st.sidebar.slider("Velocidad inicial perpendicular a x en (km/s)", 0.0, 50.0, 1.0, 30.0)
 v_0 = v_0*1000
 M_solares = st.sidebar.slider("Masa de la estrella (masas solares)", 1.0, 100.0, 10.0, 1.0)
 col1 = st.sidebar.columns(1)

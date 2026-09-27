@@ -15,7 +15,7 @@ st.write(
 )
 
 st.sidebar.header("Parámetros")
-e= st.sidebar.slider("Excentricidad", 0.0, 1.0, 0.5, 0.01)
+e= st.sidebar.slider("Excentricidad", 0.0, 0.99, 0.5, 0.01)
 r_0_ua = st.sidebar.slider("Posición inicial en x (UA)", 0.5, 10.0, 1.0, 0.5)
 M_solares = st.sidebar.slider("Masa de la estrella (masas solares)", 1.0, 100.0, 10.0, 1.0)
 col1 = st.sidebar.columns(1)
@@ -48,9 +48,9 @@ def generar_escenario(
     axis.tick_params(colors="white", which="both")
     for spine in axis.spines.values():
         spine.set_edgecolor("white")
-    lim_ua = 20.0
+    lim_ua = 40.0
     axis.set_xlim([-lim_ua, lim_ua])
-    axis.set_ylim([-lim_ua, lim_ua])
+    axis.set_ylim([-lim_ua/2, lim_ua/2])
     axis.imshow(fondo, extent=[-lim_ua, lim_ua, -lim_ua, lim_ua], zorder=0, aspect='auto')
     sol_x = c/UA
     axis.imshow(sol, extent=[sol_x - 1.5, sol_x + 1.5, -1.5, 1.5], zorder=1)

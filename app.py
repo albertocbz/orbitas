@@ -52,7 +52,7 @@ def generar_escenario(
     axis.set_xlim([-lim_ua, lim_ua])
     axis.set_ylim([-lim_ua, lim_ua])
     axis.imshow(fondo, extent=[-lim_ua, lim_ua, -lim_ua, lim_ua], zorder=0, aspect='auto')
-    sol_x = 0
+    sol_x = c/UA
     axis.imshow(sol, extent=[sol_x - 1.5, sol_x + 1.5, -1.5, 1.5], zorder=1)
     
     if mostrar_planeta and x_anim is not None:
@@ -83,7 +83,7 @@ def generar_escenario(
 if st.session_state.animando:
     M = np.linspace(0, 2 * np.pi, 120)
     
-    x_trayectoria = a * (np.cos(M) - e)
+    x_trayectoria = a * np.cos(M)
     y_trayectoria = a * np.sqrt(1 - e**2) * np.sin(M)
     
     for i in range(1, len(x_trayectoria)):

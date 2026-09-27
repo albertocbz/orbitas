@@ -26,7 +26,8 @@ r_0 = r_0_ua * 1.496e11
 a = r_0 / (1-e)
 c = e * a
 UA = 1.496e11
-
+a_ua = a / UA
+b_ua = a * np.sqrt(1 - e**2) / UA
 fondo = Image.open("fondo-2.jpg")
 planeta = Image.open("tierra.png")
 sol = Image.open("sol.png")
@@ -48,9 +49,10 @@ def generar_escenario(
     axis.tick_params(colors="white", which="both")
     for spine in axis.spines.values():
         spine.set_edgecolor("white")
-    lim_ua = 20
-    axis.set_xlim([-lim_ua, lim_ua])
-    axis.set_ylim([-lim_ua/2, lim_ua/2])
+    lim_x = a_ua * 1.15
+    lim_y = b_ua * 1.15
+    axis.set_xlim([-lim_x, lim_x])
+    axis.set_ylim([-lim_y, lim_y])
     axis.imshow(fondo, extent=[-lim_ua, lim_ua, -lim_ua, lim_ua], zorder=0, aspect='auto')
     sol_x = c/UA
     axis.imshow(sol, extent=[sol_x - 1.5, sol_x + 1.5, -1.5, 1.5], zorder=1)

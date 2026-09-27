@@ -55,8 +55,8 @@ def generar_escenario(
     axis.set_ylim([-lim_y, lim_y])
     axis.imshow(fondo, extent=[-lim_x, lim_x, -lim_y, lim_y], zorder=0, aspect='auto')
     sol_x = c/UA
-    t_sol = a_ua*0.075
-    t_tierra = a_ua*0.05
+    t_sol = lim_x*0.075
+    t_tierra = lim_x*0.05
     axis.imshow(sol, extent=[sol_x - t_sol, sol_x + t_sol, -t_sol, t_sol], zorder=1)
     
     if mostrar_planeta and x_anim is not None:

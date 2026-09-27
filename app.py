@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 import streamlit as st
 from scipy.optimize import newton
+
 st.set_page_config(
     page_title="Simulador de órbitas", layout="centered"
 )
@@ -12,26 +13,40 @@ st.write(
     "Ajusta los parámetros con los controles de la izquierda y haz clic en"
     " **Play**."
 )
+
 st.sidebar.header("Parámetros")
-e=st.sidebar.slider("Excentricidad", 0.0, 1.0, 0.5, 0.01)
-r_0=st.sidebar.slider("Posición inicial en x (UA)", 0.5, 10.0, 1.0, 0.5)
-r_0=r_0*1.496e11
-M = st.sidebar.slider("Masa de la estrella (masas solares)", 1.0, 100.0, 10.0, 1.0)
-M = M * 1.989e30
-m=5.98e24
-G=6.67e-11
-a=r_0/(1-e**2)
-c=e*a
-col1=st.sidebar.columns(1)
-play=col1[0].button("Play")
+e = st.sidebar.slider("Excentricidad", 0.0, 0.99, 0.5, 0.01)
+r_0_ua = st.sidebar.slider("Posición inicial en x (UA)", 0.5, 10.0, 1.0, 0.5)
+
+M_solares = st.sidebar.slider("Masa de la estrella (masas solares)", 1.0, 100.0, 10.0, 1.0)
+
+# Botón corregido con índice [0]
+col1 = st.sidebar.columns(1)
+play = col1[0].button("Play")
+
+# Constantes físicas
+G = 6.67430e-11
+M = M_solares * 1.989e30
+r_0 = r_0_ua * 1.496e11
+
+a = r_0 / (1 - e**2)
+c = e * a
+
+# Factor de conversión a Unidades Astronómicas (UA) para graficar limpio
+UA = 1.496e11
+
 fondo = Image.open("fondo-2.jpg")
 planeta = Image.open("tierra.png")
-sol= Image.open("sol.png")
+sol = Image.open("sol.png")
+
 if "animando" not in st.session_state:
   st.session_state.animando = False
+
 if play:
   st.session_state.animando = True
+
 contenedor_grafico = st.empty()
+
 def generar_escenario(
         x_anim=None, y_anim=None, mostrar_planeta=False, frame_actual=0
 ):
@@ -41,41 +56,56 @@ def generar_escenario(
     axis.tick_params(colors="white", which="both")
     for spine in axis.spines.values():
         spine.set_edgecolor("white")
-    axis.set_xlim([0, 20*1.496e11])
-    axis.set_ylim([0, 20*1.496e11])
-    axis.imshow(fondo, extent=[0, 20*1.496e11, 0, 20*1.296e11], zorder=0)
-    axis.imshow(sol, extent=[c-1e11, c+1e11,10*1.296e11-1e11,10*1.296e11+1e11], zorder=1)
+    
+    # Límites del gráfico en Unidades Astronómicas (UA)
+    lim_ua = 15.0
+    axis.set_xlim([-lim_ua, lim_ua])
+    axis.set_ylim([-lim_ua, lim_ua])
+    
+    # Mostrar fondo adaptado a UA
+    axis.imshow(fondo, extent=[-lim_ua, lim_ua, -lim_ua, lim_ua], zorder=0, aspect='auto')
+    
+    # Posición del Sol en UA (el foco está en x = c/UA, y = 0)
+    sol_x = c / UA
+    axis.imshow(sol, extent=[sol_x - 1.5, sol_x + 1.5, -1.5, 1.5], zorder=1)
+    
     if mostrar_planeta and x_anim is not None:
+        # Convertir trayectoria a UA
+        x_ua = x_anim / UA
+        y_ua = y_anim / UA
+        
         inicio_estela = max(0, frame_actual - 15)
 
         axis.plot(
-            x_anim[inicio_estela:frame_actual + 1],
-            y_anim[inicio_estela:frame_actual + 1],
-            color="blue",
-            linewidth=3,
+            x_ua[inicio_estela:frame_actual + 1],
+            y_ua[inicio_estela:frame_actual + 1],
+            color="cyan",
+            linewidth=2.5,
             zorder=4,
         )
         axis.imshow(
             planeta,
             extent=[
-                x_anim[frame_actual] - 9e10,
-                x_anim[frame_actual] + 9e10,
-                y_anim[frame_actual] - 9e10,
-                y_anim[frame_actual] + 9e10,
+                x_ua[frame_actual] - 1.0,
+                x_ua[frame_actual] + 1.0,
+                y_ua[frame_actual] - 1.0,
+                y_ua[frame_actual] + 1.0,
             ],
             zorder=9,
         )
     return fig
+
 if st.session_state.animando:
-    t_max = 2*np.pi*np.sqrt(a**3/(G*M))
-    t = np.linspace(0, t_max, 60)
-    n=np.sqrt(G*M/a**3)
+    t_max = 2 * np.pi * np.sqrt(a**3 / (G * M))
+    t = np.linspace(0, t_max, 100)
+    n = np.sqrt(G * M / a**3)
     E = newton(
         lambda E: E - e * np.sin(E) - n * t,
         n * t
     )
-    x_trayectoria = a*(np.cos(E)-e)
-    y_trayectoria = a*np.sqrt(1-e**2)*np.sin(E)
+    x_trayectoria = a * (np.cos(E) - e)
+    y_trayectoria = a * np.sqrt(1 - e**2) * np.sin(E)
+    
     for i in range(1, len(x_trayectoria)):
         fig = generar_escenario(
             x_trayectoria, y_trayectoria, mostrar_planeta=True, frame_actual=i

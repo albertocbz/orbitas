@@ -13,7 +13,7 @@ st.write(
     " **Play**."
 )
 st.sidebar.header("Parámetros")
-e=st.sidebar.slider("Excentricidad", 0.0, 1, 0.5, 0.01)
+e=st.sidebar.slider("Excentricidad", 0.0, 1.0, 0.5, 0.01)
 r_0=st.sidebar.slider("Posición inicial en x (UA)", 0.5, 10, 1, 0.5)
 r_0=r_0*1.496e11
 M = st.sidebar.slider("Masa de la estrella (masas solares)", 1.0, 100.0, 10.0, 1.0)

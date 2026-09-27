@@ -115,9 +115,7 @@ if st.session_state.animando:
     st.session_state.animando = False
     st.rerun()
 else:
-    # Si no está animando, mostramos la órbita completa estática o el escenario inicial
--   fig = generar_escenario()
-+   # Opcional: puedes mostrar la órbita completa estática llamando a generar_escenario con la trayectoria completa
+    fig = generar_escenario()
     E_estatico = np.linspace(0, 2 * np.pi, 120)
     fig = generar_escenario(
         a * (np.cos(E_estatico) - e), 

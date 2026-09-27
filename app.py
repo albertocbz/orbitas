@@ -71,10 +71,10 @@ def generar_escenario(
         axis.imshow(
             planeta,
             extent=[
-                x_ua[frame_actual] - 1.0,
-                x_ua[frame_actual] + 1.0,
-                y_ua[frame_actual] - 1.0,
-                y_ua[frame_actual] + 1.0,
+                x_ua[frame_actual] - 0.8,
+                x_ua[frame_actual] + 0.8,
+                y_ua[frame_actual] - 0.8,
+                y_ua[frame_actual] + 0.8,
             ],
             zorder=9,
         )

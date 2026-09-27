@@ -85,10 +85,16 @@ def generar_escenario(
     return fig
 
 if st.session_state.animando:
-    M = np.linspace(0, 2 * np.pi, 120)
+    M_values = np.linspace(0, 2 * np.pi, 120)
     
-    x_trayectoria = a * np.cos(M)
-    y_trayectoria = a * np.sqrt(1 - e**2) * np.sin(M)
+    x_trayectoria = a * np.cos(M_values)
+    y_trayectoria = a * np.sqrt(1 - e**2) * np.sin(M_values)
+    
+    # El tiempo de pausa disminuye si la masa es muy grande (va más rápido)
+    # Usamos una referencia base, por ejemplo, con M_solares = 10
+    velocidad_base = 0.01
+    frecuencia_relativa = np.sqrt(M_solares / 10.0)
+    tiempo_pausa = velocidad_base / frecuencia_relativa
     
     for i in range(1, len(x_trayectoria)):
         fig = generar_escenario(
@@ -96,15 +102,5 @@ if st.session_state.animando:
         )
         contenedor_grafico.pyplot(fig)
         plt.close(fig)
-        time.sleep(0.01)
-else:
-    fig = generar_escenario()
-    E_estatico = np.linspace(0, 2 * np.pi, 60)
-    fig = generar_escenario(
-        a * (np.cos(E_estatico) - e), 
-        a * np.sqrt(1 - e**2) * np.sin(E_estatico), 
-        mostrar_planeta=True, 
-        frame_actual=len(E_estatico)-1
-    )
-    contenedor_grafico.pyplot(fig)
-    plt.close(fig)
+        time.sleep(max(0.001, tiempo_pausa))  # Evita valores negativos o cero
+    st.rerun()

@@ -27,7 +27,6 @@ a = r_0 / (1-e)
 c = e * a
 UA = 1.496e11
 a_ua = a / UA
-b_ua = a * np.sqrt(1 - e**2) / UA
 fondo = Image.open("fondo-2.jpg")
 planeta = Image.open("tierra.png")
 sol = Image.open("sol.png")
@@ -50,12 +49,14 @@ def generar_escenario(
     for spine in axis.spines.values():
         spine.set_edgecolor("white")
     lim_x = a_ua * 1.15
-    lim_y = b_ua * 1.15
+    lim_y = lim_x/2
     axis.set_xlim([-lim_x, lim_x])
     axis.set_ylim([-lim_y, lim_y])
     axis.imshow(fondo, extent=[-lim_x, lim_x, -lim_y, lim_y], zorder=0, aspect='auto')
     sol_x = c/UA
-    axis.imshow(sol, extent=[sol_x - 1.5, sol_x + 1.5, -1.5, 1.5], zorder=1)
+    t_sol = a_ua*0.075
+    t_tierra = a_ua*0.05
+    axis.imshow(sol, extent=[sol_x - t_sol, sol_x + t_sol, -t_sol, t_sol], zorder=1)
     
     if mostrar_planeta and x_anim is not None:
         x_ua = x_anim / UA
@@ -73,10 +74,10 @@ def generar_escenario(
         axis.imshow(
             planeta,
             extent=[
-                x_ua[frame_actual] - 0.8,
-                x_ua[frame_actual] + 0.8,
-                y_ua[frame_actual] - 0.8,
-                y_ua[frame_actual] + 0.8,
+                x_ua[frame_actual] - t_tierra,
+                x_ua[frame_actual] + t_tierra,
+                y_ua[frame_actual] - t_tierra,
+                y_ua[frame_actual] + t_tierra,
             ],
             zorder=9,
         )
@@ -94,10 +95,10 @@ if st.session_state.animando:
         )
         contenedor_grafico.pyplot(fig)
         plt.close(fig)
-        time.sleep(0.03)
+        time.sleep(0.01)
 else:
     fig = generar_escenario()
-    E_estatico = np.linspace(0, 2 * np.pi, 120)
+    E_estatico = np.linspace(0, 2 * np.pi, 60)
     fig = generar_escenario(
         a * (np.cos(E_estatico) - e), 
         a * np.sqrt(1 - e**2) * np.sin(E_estatico), 

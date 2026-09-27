@@ -48,7 +48,7 @@ def generar_escenario(
     axis.tick_params(colors="white", which="both")
     for spine in axis.spines.values():
         spine.set_edgecolor("white")
-    lim_ua = 2*a+2
+    lim_ua = 20
     axis.set_xlim([-lim_ua, lim_ua])
     axis.set_ylim([-lim_ua/2, lim_ua/2])
     axis.imshow(fondo, extent=[-lim_ua, lim_ua, -lim_ua, lim_ua], zorder=0, aspect='auto')

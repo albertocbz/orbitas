@@ -96,13 +96,10 @@ def generar_escenario(
     return fig
 
 if st.session_state.animando:
-    t_max = 2 * np.pi * np.sqrt(a**3 / (G * M))
-    t = np.linspace(0, t_max, 100)
-    n = np.sqrt(G * M / a**3)
-    E = newton(
-        lambda E: E - e * np.sin(E) - n * t,
-        n * t
-    )
+    # 1. Definimos E uniformemente de 0 a 2*pi para completar toda la órbita elíptica
+    E = np.linspace(0, 2 * np.pi, 120)
+    
+    # 2. Ecuaciones paramétricas de la elipse en función de E
     x_trayectoria = a * (np.cos(E) - e)
     y_trayectoria = a * np.sqrt(1 - e**2) * np.sin(E)
     
@@ -113,7 +110,20 @@ if st.session_state.animando:
         contenedor_grafico.pyplot(fig)
         plt.close(fig)
         time.sleep(0.03)
+    
+    # Al terminar la vuelta completa, desactivamos el estado de animación para que se detenga ordenadamente
+    st.session_state.animando = False
+    st.rerun()
 else:
-    fig = generar_escenario()
+    # Si no está animando, mostramos la órbita completa estática o el escenario inicial
+-   fig = generar_escenario()
++   # Opcional: puedes mostrar la órbita completa estática llamando a generar_escenario con la trayectoria completa
+    E_estatico = np.linspace(0, 2 * np.pi, 120)
+    fig = generar_escenario(
+        a * (np.cos(E_estatico) - e), 
+        a * np.sqrt(1 - e**2) * np.sin(E_estatico), 
+        mostrar_planeta=True, 
+        frame_actual=len(E_estatico)-1
+    )
     contenedor_grafico.pyplot(fig)
     plt.close(fig)

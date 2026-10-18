@@ -48,7 +48,7 @@ if st.session_state.animando:
 
 
     frecuencia_relativa = np.sqrt(M_solares / 10.0)
-    tiempo_pausa = 0.01 / frecuencia_relativa
+    tiempo_pausa = 0.002 / frecuencia_relativa
 
   
     fig, axis = plt.subplots(figsize=(8, 4.5))
@@ -95,7 +95,6 @@ if st.session_state.animando:
         zorder=4
     )
 
-    # Posición inicial del planeta
     planeta_artist = axis.imshow(
         planeta,
         extent=[
@@ -112,7 +111,7 @@ if st.session_state.animando:
             x_ua = x_trayectoria[i] / UA
             y_ua = y_trayectoria[i] / UA
 
-            # Actualizar únicamente la estela
+    
             inicio_estela = max(0, i - 15)
 
             estela.set_data(
@@ -120,7 +119,7 @@ if st.session_state.animando:
                 y_trayectoria[inicio_estela:i + 1] / UA
             )
 
-            # Mover la imagen del planeta sin crear otra
+
             planeta_artist.set_extent([
                 x_ua - t_tierra,
                 x_ua + t_tierra,
@@ -128,7 +127,7 @@ if st.session_state.animando:
                 y_ua + t_tierra
             ])
 
-            # Mostrar la figura reutilizada
+
             contenedor_grafico.pyplot(
                 fig,
                 clear_figure=False

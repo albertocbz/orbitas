@@ -48,7 +48,7 @@ if st.session_state.animando:
 
 
     frecuencia_relativa = np.sqrt(M_solares / 10.0)
-    tiempo_pausa = 0.002 / frecuencia_relativa
+    tiempo_pausa = 0.01 / frecuencia_relativa
 
   
     fig, axis = plt.subplots(figsize=(8, 4.5))

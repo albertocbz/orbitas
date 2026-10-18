@@ -33,74 +33,110 @@ planeta = Image.open("tierra.png")
 sol = Image.open("sol.png")
 
 if "animando" not in st.session_state:
-  st.session_state.animando = False
+    st.session_state.animando = False
 
 if play:
-  st.session_state.animando = True
+    st.session_state.animando = True
 
 contenedor_grafico = st.empty()
 
-def generar_escenario(
-        x_anim=None, y_anim=None, mostrar_planeta=False, frame_actual=0
-):
+if st.session_state.animando:
+    M_values = np.linspace(0, 2 * np.pi, 120)
+
+    x_trayectoria = a * np.cos(M_values)
+    y_trayectoria = a * np.sqrt(1 - e**2) * np.sin(M_values)
+
+
+    frecuencia_relativa = np.sqrt(M_solares / 10.0)
+    tiempo_pausa = 0.01 / frecuencia_relativa
+
+  
     fig, axis = plt.subplots(figsize=(8, 4.5))
+
     fig.patch.set_facecolor("#1e1e1e")
     axis.set_facecolor("#1e1e1e")
     axis.tick_params(colors="white", which="both")
+
     for spine in axis.spines.values():
         spine.set_edgecolor("white")
+
     lim_x = a_ua * 1.15
     lim_y = b_ua * 1.15
-    axis.set_xlim([-lim_x, lim_x])
-    axis.set_ylim([-lim_y, lim_y])
-    axis.imshow(fondo, extent=[-lim_x, lim_x, -lim_y, lim_y], zorder=0, aspect='auto')
-    sol_x = c/UA
-    t_sol = lim_x*0.075
-    t_tierra = lim_x*0.05
-    axis.imshow(sol, extent=[sol_x - t_sol, sol_x + t_sol, -t_sol, t_sol], zorder=1)
-    
-    if mostrar_planeta and x_anim is not None:
-        x_ua = x_anim / UA
-        y_ua = y_anim / UA
-        
-        inicio_estela = max(0, frame_actual - 15)
 
-        axis.plot(
-            x_ua[inicio_estela:frame_actual + 1],
-            y_ua[inicio_estela:frame_actual + 1],
-            color="cyan",
-            linewidth=2.5,
-            zorder=4,
-        )
-        axis.imshow(
-            planeta,
-            extent=[
-                x_ua[frame_actual] - t_tierra,
-                x_ua[frame_actual] + t_tierra,
-                y_ua[frame_actual] - t_tierra,
-                y_ua[frame_actual] + t_tierra,
-            ],
-            zorder=9,
-        )
-    return fig
+    axis.set_xlim(-lim_x, lim_x)
+    axis.set_ylim(-lim_y, lim_y)
 
-if st.session_state.animando:
-    M_values = np.linspace(0, 2 * np.pi, 120)
-    
-    x_trayectoria = a * np.cos(M_values)
-    y_trayectoria = a * np.sqrt(1 - e**2) * np.sin(M_values)
-    
-    # El tiempo de pausa disminuye si la masa es muy grande (va más rápido)
-    # Usamos una referencia base, por ejemplo, con M_solares = 10
-    velocidad_base = 0.01
-    frecuencia_relativa = np.sqrt(M_solares / 10.0)
-    tiempo_pausa = velocidad_base / frecuencia_relativa
-    
-    for i in range(1, len(x_trayectoria)):
-        fig = generar_escenario(
-            x_trayectoria, y_trayectoria, mostrar_planeta=True, frame_actual=i
-        )
-        contenedor_grafico.pyplot(fig)
+    # Fondo y Sol: se dibujan una sola vez
+    axis.imshow(
+        fondo,
+        extent=[-lim_x, lim_x, -lim_y, lim_y],
+        zorder=0,
+        aspect="auto"
+    )
+
+    sol_x = c / UA
+    t_sol = lim_x * 0.075
+    t_tierra = lim_x * 0.05
+
+    axis.imshow(
+        sol,
+        extent=[
+            sol_x - t_sol, sol_x + t_sol,
+            -t_sol, t_sol
+        ],
+        zorder=1
+    )
+
+
+    estela, = axis.plot(
+        [], [],
+        color="cyan",
+        linewidth=2.5,
+        zorder=4
+    )
+
+    # Posición inicial del planeta
+    planeta_artist = axis.imshow(
+        planeta,
+        extent=[
+            x_trayectoria[0] / UA - t_tierra,
+            x_trayectoria[0] / UA + t_tierra,
+            y_trayectoria[0] / UA - t_tierra,
+            y_trayectoria[0] / UA + t_tierra
+        ],
+        zorder=9
+    )
+
+    try:
+        for i in range(1, len(x_trayectoria)):
+            x_ua = x_trayectoria[i] / UA
+            y_ua = y_trayectoria[i] / UA
+
+            # Actualizar únicamente la estela
+            inicio_estela = max(0, i - 15)
+
+            estela.set_data(
+                x_trayectoria[inicio_estela:i + 1] / UA,
+                y_trayectoria[inicio_estela:i + 1] / UA
+            )
+
+            # Mover la imagen del planeta sin crear otra
+            planeta_artist.set_extent([
+                x_ua - t_tierra,
+                x_ua + t_tierra,
+                y_ua - t_tierra,
+                y_ua + t_tierra
+            ])
+
+            # Mostrar la figura reutilizada
+            contenedor_grafico.pyplot(
+                fig,
+                clear_figure=False
+            )
+
+            time.sleep(max(0.001, tiempo_pausa))
+
+    finally:
         plt.close(fig)
-        time.sleep(max(0.001, tiempo_pausa))  # Evita valores negativos o cero
-    st.rerun()
+        st.session_state.animando = False
+
